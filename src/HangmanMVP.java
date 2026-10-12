@@ -13,11 +13,18 @@ public class HangmanMVP {
         while (checkClosedLetters(openedLetters)) {
             System.out.println("Введите букву: ");
             String input = scanner.nextLine();
+
             if (input.length() == 1) {
                 char guessLetter = input.charAt(0);
                 if (guessLetter >= 'a' && guessLetter <= 'z') {
                     boolean foundLetter  = openedFindLetters(openedLetters, secretWord, guessLetter);
                     countMistakes = updateMistakeCount(foundLetter,countMistakes);
+                    // Поражение после шести ошибок
+                    // При шестой ошибке программа выводит сообщение о поражении и выходит из цикла.
+                    if (countMistakes == 6){
+                        System.out.println("Вы проиграли");
+                        break;
+                    }
                     showWord(openedLetters,secretWord);
                 } else {
                     System.out.println("Вы ввели не букву");
@@ -25,8 +32,11 @@ public class HangmanMVP {
             } else {
                 System.out.println("Введите ровно одну букву!");
             }
+            // Победа после открытия всех букв
+            if (!checkClosedLetters(openedLetters)) {
+                System.out.println("Вы победили!");
+            }
         }
-        System.out.println("вы победили!");
     }
 
     // Вывести текущее состояние слова
