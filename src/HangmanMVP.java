@@ -7,6 +7,8 @@ public class HangmanMVP {
         boolean[] openedLetters = new boolean[secretWord.length()];
         showWord(openedLetters, secretWord);
         int countMistakes = 0;
+        char[] guessedLetters = new char[26];
+        int countOfLetters = 0;
 
         //Игровой цикл
 
@@ -17,15 +19,23 @@ public class HangmanMVP {
             if (input.length() == 1) {
                 char guessLetter = input.charAt(0);
                 if (guessLetter >= 'a' && guessLetter <= 'z') {
-                    boolean foundLetter  = openedFindLetters(openedLetters, secretWord, guessLetter);
-                    countMistakes = updateMistakeCount(foundLetter,countMistakes);
-                    // Поражение после шести ошибок
-                    // При шестой ошибке программа выводит сообщение о поражении и выходит из цикла.
-                    if (countMistakes == 6){
-                        System.out.println("Вы проиграли");
-                        break;
+                    if (wasLetterGuessed(guessedLetters,guessLetter)){
+                        System.out.println("Буква уже ранее вводилась");
+
+                    }else {
+                        guessedLetters[countOfLetters] = guessLetter;
+                        countOfLetters++;
+                        boolean foundLetter  = openedFindLetters(openedLetters, secretWord, guessLetter);
+                        countMistakes = updateMistakeCount(foundLetter,countMistakes);
+                        // Поражение после шести ошибок
+                        // При шестой ошибке программа выводит сообщение о поражении и выходит из цикла.
+                        if (countMistakes == 6){
+                            System.out.println("Вы проиграли");
+                            break;
+                        }
+                        showWord(openedLetters,secretWord);
                     }
-                    showWord(openedLetters,secretWord);
+
                 } else {
                     System.out.println("Вы ввели не букву");
                 }
@@ -77,5 +87,14 @@ public class HangmanMVP {
             System.out.println("Ошибок: " + count);
         }
         return count;
+    }
+
+    static boolean wasLetterGuessed(char[] guessedLetters, char guessLetter) {
+        for (int i = 0; i < guessedLetters.length; i++) {
+            if (guessedLetters[i] == guessLetter) {
+                return true;
+            }
+        }
+        return false;
     }
 }
