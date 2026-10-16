@@ -1,10 +1,10 @@
-# Hangman
+# Виселица (Hangman)
 
-Console Hangman game written in Java.
+Консольная игра «Виселица», написанная на Java.
 
-## Features
+## Возможности
 
-- Guess letters to reveal a secret word
-- Track incorrect guesses
-- Prevent duplicate guesses
-- Win and lose conditions
+- Угадывание букв для открытия загаданного слова
+- Подсчёт неправильных попыток
+- Защита от повторного ввода уже названных букв
+- Условия победы и поражения
