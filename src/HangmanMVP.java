@@ -1,4 +1,6 @@
+import java.util.LinkedHashSet;
 import java.util.Scanner;
+import java.util.Set;
 
 public class HangmanMVP {
 
@@ -22,11 +24,10 @@ public class HangmanMVP {
         // Количество ошибок игрока
         int mistakeCount = 0;
 
-        // Массив для хранения уже введённых букв
-        char[] guessedLetters = new char[26];
+        // коллекция для хранения уже введённых букв
 
-        // Сколько букв уже записано в массив guessedLetters
-        int guessedLetterCount = 0;
+        Set<Character> guessedLetters= new LinkedHashSet<>();
+
 
         // Показываем слово в начале игры (все буквы скрыты)
         displayWord(revealedPositions, secretWord);
@@ -63,7 +64,7 @@ public class HangmanMVP {
                     // 2.3. ПРОВЕРКА ПОВТОРНОГО ВВОДА
                     // ========================================
 
-                    if (wasLetterGuessed(guessedLetters, guessedLetter)) {
+                    if (guessedLetters.contains(guessedLetter)) {
 
                         System.out.println("Буква уже ранее вводилась");
 
@@ -73,16 +74,15 @@ public class HangmanMVP {
                         // 2.4. СОХРАНЕНИЕ НОВОЙ БУКВЫ
                         // ========================================
 
-                        // Запоминаем введённую букву
-                        guessedLetters[guessedLetterCount] = guessedLetter;
+                        // добавляем и запоминаем введённую букву
+                        guessedLetters.add(guessedLetter);
+                        // Теперь буква добавляется в LinkedHashSet, а повторные значения не сохраняются. Переменная guessedLetterCount нам больше не нужна.
 
-                        // Увеличиваем количество введённых букв
-                        guessedLetterCount++;
 
                         // ========================================
                         // 2.5. ВЫВОД ВВЕДЕННЫХ БУКВ
                         // ========================================
-                        displayGuessedLetters(guessedLetters,guessedLetterCount);
+                        displayGuessedLetters(guessedLetters);
                         // ========================================
                         // 2.6. ПОИСК БУКВЫ В СЛОВЕ
                         // ========================================
@@ -116,7 +116,7 @@ public class HangmanMVP {
                         // После шестой ошибки игра заканчивается
                         if (mistakeCount == 6) {
 
-                            System.out.println("Вы проиграли");
+                            System.out.println("Вы проиграли. Было загадано: " + secretWord);
                             break;
                         }
 
@@ -267,47 +267,19 @@ public class HangmanMVP {
     }
 
 
-    // МЕТОД 5. ПРОВЕРКА ПОВТОРНОГО ВВОДА
-    //
-    // Проверяет, вводил ли игрок эту букву раньше.
-    //
-    // Сравнивает введённую букву с элементами
-    // массива guessedLetters.
-    //
-    // Возвращает:
-    // true  — такая буква уже вводилась
-    // false — буква ещё не вводилась
-
-    static boolean wasLetterGuessed(
-            char[] guessedLetters,
-            char guessedLetter
-    ) {
-
-        for (int i = 0; i < guessedLetters.length; i++) {
-
-            if (guessedLetters[i] == guessedLetter) {
-
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     // МЕТОД 5. Отображение введённых букв
     //
     // выводи информацию о том, какие буквы были введены.
     //
-    public static void displayGuessedLetters(char[] guessedLetters, int guessedLetterCount) {
+    public static void displayGuessedLetters(Set<Character> guessedLetters) {
         System.out.print("Введённые буквы: ");
-        for (int i = 0; i < guessedLetterCount; i++) {
-            System.out.print(guessedLetters[i] + " ");
+
+        for (char letter: guessedLetters){
+            System.out.print(letter + " ");
         }
+
         System.out.println();
-        System.out.println("Угадайте следующую букву:");
+
     }
-
-
-
 
 }
