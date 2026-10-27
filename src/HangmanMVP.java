@@ -1,21 +1,27 @@
 import java.util.LinkedHashSet;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.List;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.io.IOException;
+import java.util.Random;
 
 public class HangmanMVP {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
         // ========================================
         // 1. ПОДГОТОВКА ИГРЫ
         // ========================================
 
         // Слово, которое игрок должен угадать
-        String secretWord = "java";
+        List<String> words = loadWords("words.txt");
+        String secretWord = chooseRandomWord(words);
 
         // Объект для чтения ввода пользователя
         Scanner scanner = new Scanner(System.in);
-
         // Для каждой буквы слова храним информацию:
         // false — буква ещё скрыта
         // true  — буква уже открыта
@@ -280,6 +286,23 @@ public class HangmanMVP {
 
         System.out.println();
 
+    }
+    // МЕТОД 5. Читаем и загружаем список слов
+    //
+    // выводи информацию о том, какие буквы были введены.
+    //
+    public static List<String> loadWords(String pathString) throws IOException {
+        Path path = Path.of(pathString);
+        return Files.readAllLines(path);
+
+    }
+    // МЕТОД 5. Выбор слова случайным образом
+    //
+    //
+    public static String chooseRandomWord(List<String> words) {
+        Random random = new Random();
+        int index = random.nextInt(words.size());
+        return words.get(index);
     }
 
 }
