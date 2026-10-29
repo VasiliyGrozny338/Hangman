@@ -10,299 +10,362 @@ import java.util.Random;
 
 public class HangmanMVP {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args)  {
 
         // ========================================
         // 1. ПОДГОТОВКА ИГРЫ
         // ========================================
-
         // Слово, которое игрок должен угадать
-        List<String> words = loadWords("words.txt");
-        String secretWord = chooseRandomWord(words);
+        List<String> words; // объявляем вне try
+
+        // Обработка если файл не найден
+        try {
+            words = loadWords("words.txt"); // загрузка файла
+        } catch (IOException e) {
+            System.out.println("Ошибка: не удалось загрузить список слов.");
+            return; // если загрузка не удалась!
+        }
+
+        // Проверка если файл оказался пустым
+        if (words.isEmpty()) {
+            System.out.println("Файл пустой");
+            return;
+        }
 
         // Объект для чтения ввода пользователя
         Scanner scanner = new Scanner(System.in);
-        // Для каждой буквы слова храним информацию:
-        // false — буква ещё скрыта
-        // true  — буква уже открыта
-        boolean[] revealedPositions = new boolean[secretWord.length()];
 
-        // Количество ошибок игрока
-        int mistakeCount = 0;
+        //Внешний цикл - меню
+        while (true) {
+            displayMenu();
+            // Ввод игрока с улучшенной обработкой ввода, где метод trim удаляет пробелы в начале и в конце строки
+            String choice = scanner.nextLine().trim();
+            if (choice.equals("1")) {
+                playGame(words, scanner);
+            } else if (choice.equals("0")) {
+                break;
+            } else {
+                System.out.println("Неизвестная команда");
+            }
+        }
+        scanner.close();
+}
 
-        // коллекция для хранения уже введённых букв
-
-        Set<Character> guessedLetters= new LinkedHashSet<>();
-
-
-        // Показываем слово в начале игры (все буквы скрыты)
-        displayWord(revealedPositions, secretWord);
-
-
+// ========================================
+        // 3.1 ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ
         // ========================================
-        // 2. ОСНОВНОЙ ИГРОВОЙ ЦИКЛ
-        // ========================================
 
-        // Продолжаем игру, пока в слове есть скрытые буквы
-        while (hasHiddenLetters(revealedPositions)) {
+        // МЕТОД 1. ОТОБРАЖЕНИЕ СЛОВА
+        //
+        // Показывает текущее состояние загаданного слова.
+        //
+        // Если позиция ещё закрыта — выводит '_'.
+        // Если позиция открыта — выводит соответствующую букву.
+        //
+        // Ничего не возвращает (void).
 
-            // ========================================
-            // 2.1. ВВОД БУКВЫ
-            // ========================================
+        static void displayWord ( boolean[] revealedPositions, String secretWord){
 
-            System.out.println("Введите букву: ");
-            String input = scanner.nextLine();
+            for (int i = 0; i < revealedPositions.length; i++) {
 
+                if (!revealedPositions[i]) {
 
-            // ========================================
-            // 2.2. ПРОВЕРКА ВВОДА
-            // ========================================
-
-            // Пользователь должен ввести ровно один символ
-            if (input.length() == 1) {
-
-                char guessedLetter = input.charAt(0);
-
-                // Разрешаем только строчные английские буквы
-                if (guessedLetter >= 'a' && guessedLetter <= 'z') {
-
-                    // ========================================
-                    // 2.3. ПРОВЕРКА ПОВТОРНОГО ВВОДА
-                    // ========================================
-
-                    if (guessedLetters.contains(guessedLetter)) {
-
-                        System.out.println("Буква уже ранее вводилась");
-
-                    } else {
-
-                        // ========================================
-                        // 2.4. СОХРАНЕНИЕ НОВОЙ БУКВЫ
-                        // ========================================
-
-                        // добавляем и запоминаем введённую букву
-                        guessedLetters.add(guessedLetter);
-                        // Теперь буква добавляется в LinkedHashSet, а повторные значения не сохраняются. Переменная guessedLetterCount нам больше не нужна.
-
-
-                        // ========================================
-                        // 2.5. ВЫВОД ВВЕДЕННЫХ БУКВ
-                        // ========================================
-                        displayGuessedLetters(guessedLetters);
-                        // ========================================
-                        // 2.6. ПОИСК БУКВЫ В СЛОВЕ
-                        // ========================================
-
-                        // Открываем все позиции, где встречается буква
-                        // true  — буква найдена
-                        // false — буквы в слове нет
-                        boolean letterFound = revealMatchingLetters(
-                                revealedPositions,
-                                secretWord,
-                                guessedLetter
-                        );
-
-
-                        // ========================================
-                        // 2.7. ОБНОВЛЕНИЕ КОЛИЧЕСТВА ОШИБОК
-                        // ========================================
-
-                        mistakeCount = updateMistakeCount(
-                                letterFound,
-                                mistakeCount
-                        );
-
-
-
-
-                        // ========================================
-                        // 2.8. ПРОВЕРКА ПОРАЖЕНИЯ
-                        // ========================================
-
-                        // После шестой ошибки игра заканчивается
-                        if (mistakeCount == 6) {
-
-                            System.out.println("Вы проиграли. Было загадано: " + secretWord);
-                            break;
-                        }
-
-
-                        // ========================================
-                        // 2.9. ОТОБРАЖЕНИЕ СЛОВА
-                        // ========================================
-
-                        // Показываем текущее состояние слова
-                        displayWord(revealedPositions, secretWord);
-                    }
+                    System.out.print('_');
 
                 } else {
 
-                    System.out.println("Вы ввели не букву");
+                    System.out.print(secretWord.charAt(i));
                 }
-
-            } else {
-
-                System.out.println("Введите ровно одну букву!");
             }
 
+            System.out.println();
 
-            // ========================================
-            // 3. ПРОВЕРКА ПОБЕДЫ
-            // ========================================
-
-            // Если скрытых букв больше нет — игрок победил
-            if (!hasHiddenLetters(revealedPositions)) {
-
-                System.out.println("Вы победили!");
-            }
         }
 
-        scanner.close();
-    }
 
+        // МЕТОД 2. ПРОВЕРКА СКРЫТЫХ БУКВ
+        //
+        // Проверяет, остались ли в слове неоткрытые позиции.
+        //
+        // Возвращает:
+        // true  — хотя бы одна буква ещё скрыта
+        // false — все буквы открыты
 
-    // ========================================
-    // 3.1 ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ
-    // ========================================
+        static boolean hasHiddenLetters ( boolean[] revealedPositions){
 
+            for (int i = 0; i < revealedPositions.length; i++) {
 
-    // МЕТОД 1. ОТОБРАЖЕНИЕ СЛОВА
-    //
-    // Показывает текущее состояние загаданного слова.
-    //
-    // Если позиция ещё закрыта — выводит '_'.
-    // Если позиция открыта — выводит соответствующую букву.
-    //
-    // Ничего не возвращает (void).
+                if (!revealedPositions[i]) {
 
-    static void displayWord(boolean[] revealedPositions, String secretWord) {
-
-        for (int i = 0; i < revealedPositions.length; i++) {
-
-            if (!revealedPositions[i]) {
-
-                System.out.print('_');
-
-            } else {
-
-                System.out.print(secretWord.charAt(i));
+                    return true;
+                }
             }
+
+            return false;
         }
 
-        System.out.println();
 
-    }
+        // МЕТОД 3. ПОИСК И ОТКРЫТИЕ БУКВЫ
+        //
+        // Ищет введённую букву в загаданном слове.
+        //
+        // Если буква встречается, открывает ВСЕ её позиции
+        // в массиве revealedPositions.
+        //
+        // Возвращает:
+        // true  — буква найдена хотя бы один раз
+        // false — такой буквы в слове нет
 
-
-    // МЕТОД 2. ПРОВЕРКА СКРЫТЫХ БУКВ
-    //
-    // Проверяет, остались ли в слове неоткрытые позиции.
-    //
-    // Возвращает:
-    // true  — хотя бы одна буква ещё скрыта
-    // false — все буквы открыты
-
-    static boolean hasHiddenLetters(boolean[] revealedPositions) {
-
-        for (int i = 0; i < revealedPositions.length; i++) {
-
-            if (!revealedPositions[i]) {
-
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-
-    // МЕТОД 3. ПОИСК И ОТКРЫТИЕ БУКВЫ
-    //
-    // Ищет введённую букву в загаданном слове.
-    //
-    // Если буква встречается, открывает ВСЕ её позиции
-    // в массиве revealedPositions.
-    //
-    // Возвращает:
-    // true  — буква найдена хотя бы один раз
-    // false — такой буквы в слове нет
-
-    static boolean revealMatchingLetters(
-            boolean[] revealedPositions,
-            String secretWord,
-            char guessedLetter
+        static boolean revealMatchingLetters (
+        boolean[] revealedPositions,
+        String secretWord,
+        char guessedLetter
     ) {
 
-        boolean letterFound = false;
+            boolean letterFound = false;
 
-        for (int i = 0; i < secretWord.length(); i++) {
+            for (int i = 0; i < secretWord.length(); i++) {
 
-            if (secretWord.charAt(i) == guessedLetter) {
+                if (secretWord.charAt(i) == guessedLetter) {
 
-                revealedPositions[i] = true;
-                letterFound = true;
+                    revealedPositions[i] = true;
+                    letterFound = true;
+                }
             }
+
+            return letterFound;
         }
 
-        return letterFound;
-    }
 
+        // МЕТОД 4. ПОДСЧЁТ ОШИБОК
+        //
+        // Получает информацию о том, найдена ли буква.
+        //
+        // Если буква не найдена:
+        // - увеличивает количество ошибок на 1;
+        // - выводит сообщение об ошибке;
+        // - показывает текущее количество ошибок.
+        //
+        // Возвращает обновлённое количество ошибок.
 
-    // МЕТОД 4. ПОДСЧЁТ ОШИБОК
-    //
-    // Получает информацию о том, найдена ли буква.
-    //
-    // Если буква не найдена:
-    // - увеличивает количество ошибок на 1;
-    // - выводит сообщение об ошибке;
-    // - показывает текущее количество ошибок.
-    //
-    // Возвращает обновлённое количество ошибок.
+        static int updateMistakeCount ( boolean letterFound, int mistakeCount){
 
-    static int updateMistakeCount(boolean letterFound, int mistakeCount) {
+            if (!letterFound) {
 
-        if (!letterFound) {
+                mistakeCount++;
 
-            mistakeCount++;
+                System.out.println("Буква не найдена!");
+                System.out.println("Ошибок: " + mistakeCount);
+            }
 
-            System.out.println("Буква не найдена!");
-            System.out.println("Ошибок: " + mistakeCount);
+            return mistakeCount;
         }
-
-        return mistakeCount;
-    }
-
-
-    // МЕТОД 5. Отображение введённых букв
+    // МЕТОД 5. Отображение виселицы
     //
     // выводи информацию о том, какие буквы были введены.
     //
-    public static void displayGuessedLetters(Set<Character> guessedLetters) {
-        System.out.print("Введённые буквы: ");
+        public static void displayHangman(int mistakeCount) {
+            // Здесь будем выбирать рисунок
+            if (mistakeCount == 0) {
+                System.out.println("Ошибок пока нет");
+            } else if (mistakeCount == 1){
+                System.out.println("Появилась первая часть виселицы");
+            } else if (mistakeCount == 2){
+                System.out.println("Появилась вторая часть виселицы");
+            } else if (mistakeCount == 3){
+                System.out.println("  +---+");
+                System.out.println("  |   |");
+                System.out.println("  O   |");
+                System.out.println("      |");
+                System.out.println("      |");
+                System.out.println("=========");
+            } else if (mistakeCount == 4){
+                System.out.println("Появилась четвертая часть виселицы");
+            } else if (mistakeCount == 5){
+                System.out.println("Появилась пятая часть виселицы");
+            } else if (mistakeCount == 6){
+                System.out.println("Появилась шестая часть виселицы");
+            }
 
-        for (char letter: guessedLetters){
-            System.out.print(letter + " ");
         }
 
-        System.out.println();
+        // МЕТОД 5. Отображение введённых букв
+        //
+        // выводи информацию о том, какие буквы были введены.
+        //
+        public static void displayGuessedLetters (Set < Character > guessedLetters) {
+            System.out.print("Введённые буквы: ");
 
-    }
-    // МЕТОД 5. Читаем и загружаем список слов
-    //
-    // выводи информацию о том, какие буквы были введены.
-    //
-    public static List<String> loadWords(String pathString) throws IOException {
-        Path path = Path.of(pathString);
-        return Files.readAllLines(path);
+            for (char letter : guessedLetters) {
+                System.out.print(letter + " ");
+            }
 
-    }
-    // МЕТОД 5. Выбор слова случайным образом
-    //
-    //
-    public static String chooseRandomWord(List<String> words) {
-        Random random = new Random();
-        int index = random.nextInt(words.size());
-        return words.get(index);
+            System.out.println();
+
+        }
+        // МЕТОД 6. Читаем и загружаем список слов
+        //
+        // выводи информацию о том, какие буквы были введены.
+        //
+        public static List<String> loadWords (String pathString) throws IOException {
+            Path path = Path.of(pathString);
+            return Files.readAllLines(path);
+
+        }
+        // МЕТОД 7. Выбор слова случайным образом
+        //
+        //
+        public static String chooseRandomWord (List < String > words) {
+            Random random = new Random();
+            int index = random.nextInt(words.size());
+            return words.get(index);
+        }
+
+        public static void displayMenu() {
+            // Здесь вывод меню
+            System.out.println("==== ВИСЕЛИЦА ====");
+            System.out.println("       Меню       ");
+            System.out.println("1 - Новая игра");
+            System.out.println("0 - Выход");
+            System.out.println();
+            System.out.print("Ваш выбор: ");
+
+        }
+
+        // Главный игровой цикл
+        public static void playGame (List < String > words, Scanner scanner){
+
+            // Секретное слово
+            String secretWord = chooseRandomWord(words);
+
+            // Для каждой буквы слова храним информацию:
+            // false — буква ещё скрыта
+            // true  — буква уже открыта
+            boolean[] revealedPositions = new boolean[secretWord.length()];
+
+            // Количество ошибок игрока
+            int mistakeCount = 0;
+
+            // коллекция для хранения уже введённых букв
+            Set<Character> guessedLetters = new LinkedHashSet<>();
+
+            // Показываем слово в начале игры (все буквы скрыты)
+            displayWord(revealedPositions, secretWord);
+
+            // ========================================
+            // 2. ОСНОВНОЙ ИГРОВОЙ ЦИКЛ
+            // ========================================
+
+            // Продолжаем игру, пока в слове есть скрытые буквы
+            while (hasHiddenLetters(revealedPositions)) {
+
+                // ========================================
+                // 2.1. ВВОД БУКВЫ
+                // ========================================
+
+                System.out.print("Введите букву: ");
+                String input = scanner.nextLine();
+
+
+                // ========================================
+                // 2.2. ПРОВЕРКА ВВОДА
+                // ========================================
+
+                // Пользователь должен ввести ровно один символ
+                if (input.length() == 1) {
+
+                    char guessedLetter = input.charAt(0);
+
+                    // Разрешаем только строчные английские буквы
+                    if (guessedLetter >= 'a' && guessedLetter <= 'z') {
+
+                        // ========================================
+                        // 2.3. ПРОВЕРКА ПОВТОРНОГО ВВОДА
+                        // ========================================
+
+                        if (guessedLetters.contains(guessedLetter)) {
+
+                            System.out.println("Буква уже ранее вводилась");
+
+                        } else {
+
+                            // ========================================
+                            // 2.4. СОХРАНЕНИЕ НОВОЙ БУКВЫ
+                            // ========================================
+
+                            // добавляем и запоминаем введённую букву
+                            guessedLetters.add(guessedLetter);
+                            // Теперь буква добавляется в LinkedHashSet, а повторные значения не сохраняются. Переменная guessedLetterCount нам больше не нужна.
+
+
+                            // ========================================
+                            // 2.5. ВЫВОД ВВЕДЕННЫХ БУКВ
+                            // ========================================
+                            displayGuessedLetters(guessedLetters);
+
+                            // ========================================
+                            // 2.6. ПОИСК БУКВЫ В СЛОВЕ
+                            // ========================================
+
+                            // Открываем все позиции, где встречается буква
+                            // true  — буква найдена
+                            // false — буквы в слове нет
+                            boolean letterFound = revealMatchingLetters(
+                                    revealedPositions,
+                                    secretWord,
+                                    guessedLetter
+                            );
+
+                            // ========================================
+                            // 2.7. ОБНОВЛЕНИЕ КОЛИЧЕСТВА ОШИБОК
+                            // ========================================
+
+                            mistakeCount = updateMistakeCount(
+                                    letterFound,
+                                    mistakeCount
+                            );
+                            displayHangman(mistakeCount);
+
+                            // ========================================
+                            // 2.8. ПРОВЕРКА ПОРАЖЕНИЯ
+                            // ========================================
+
+                            // После шестой ошибки игра заканчивается
+                            if (mistakeCount == 6) {
+
+                                System.out.println("Вы проиграли. Было загадано: " + secretWord);
+                                System.out.println();
+                                break;
+                            }
+
+                            // ========================================
+                            // 2.9. ОТОБРАЖЕНИЕ СЛОВА
+                            // ========================================
+
+                            // Показываем текущее состояние слова
+                            displayWord(revealedPositions, secretWord);
+                        }
+
+                    } else {
+                        System.out.println("Вы ввели не букву");
+                    }
+
+                } else {
+                    System.out.println("Введите ровно одну букву!");
+                }
+
+                // ========================================
+                // 3. ПРОВЕРКА ПОБЕДЫ
+                // ========================================
+
+                // Если скрытых букв больше нет — игрок победил
+                if (!hasHiddenLetters(revealedPositions)) {
+
+                    System.out.println("Вы победили!");
+                    System.out.println();
+                }
+            }
+
     }
 
 }
