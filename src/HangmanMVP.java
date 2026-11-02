@@ -169,9 +169,14 @@ public class HangmanMVP {
             if (mistakeCount == 0) {
                 System.out.println("Ошибок пока нет");
             } else if (mistakeCount == 1){
-                System.out.println("Появилась первая часть виселицы");
+                System.out.println("=========");
             } else if (mistakeCount == 2){
-                System.out.println("Появилась вторая часть виселицы");
+                System.out.println("      |");
+                System.out.println("      |");
+                System.out.println("      |");
+                System.out.println("      |");
+                System.out.println("      |");
+                System.out.println("=========");
             } else if (mistakeCount == 3){
                 System.out.println("  +---+");
                 System.out.println("  |   |");
@@ -180,11 +185,26 @@ public class HangmanMVP {
                 System.out.println("      |");
                 System.out.println("=========");
             } else if (mistakeCount == 4){
-                System.out.println("Появилась четвертая часть виселицы");
+                System.out.println("  +---+");
+                System.out.println("  |   |");
+                System.out.println("  O   |");
+                System.out.println("  |   |");
+                System.out.println("      |");
+                System.out.println("=========");
             } else if (mistakeCount == 5){
-                System.out.println("Появилась пятая часть виселицы");
+                System.out.println("  +---+");
+                System.out.println("  |   |");
+                System.out.println("  O   |");
+                System.out.println(" /|\\   |");
+                System.out.println("      |");
+                System.out.println("=========");
             } else if (mistakeCount == 6){
-                System.out.println("Появилась шестая часть виселицы");
+                System.out.println("  +---+");
+                System.out.println("  |   |");
+                System.out.println("  O   |");
+                System.out.println(" /|\\   |");
+                System.out.println(" / \\   |");
+                System.out.println("=========");
             }
 
         }
@@ -205,7 +225,7 @@ public class HangmanMVP {
         }
         // МЕТОД 6. Читаем и загружаем список слов
         //
-        // выводи информацию о том, какие буквы были введены.
+        //
         //
         public static List<String> loadWords (String pathString) throws IOException {
             Path path = Path.of(pathString);
