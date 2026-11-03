@@ -31,7 +31,8 @@ public class HangmanMVP {
             System.out.println("Файл пустой");
             return;
         }
-
+        // Количество попыток
+        int numberOfAttempts = 6;
         // Объект для чтения ввода пользователя
         Scanner scanner = new Scanner(System.in);
 
@@ -41,7 +42,7 @@ public class HangmanMVP {
             // Ввод игрока с улучшенной обработкой ввода, где метод trim удаляет пробелы в начале и в конце строки
             String choice = scanner.nextLine().trim();
             if (choice.equals("1")) {
-                playGame(words, scanner);
+                playGame(words, scanner,numberOfAttempts);
             } else if (choice.equals("0")) {
                 break;
             } else {
@@ -155,7 +156,7 @@ public class HangmanMVP {
                 mistakeCount++;
 
                 System.out.println("Буква не найдена!");
-                System.out.println("Ошибок: " + mistakeCount);
+
             }
 
             return mistakeCount;
@@ -164,7 +165,7 @@ public class HangmanMVP {
     //
     // выводи информацию о том, какие буквы были введены.
     //
-        public static void displayHangman(int mistakeCount) {
+        public static void displayHangman(int mistakeCount, int numberOfAttemps) {
             // Здесь будем выбирать рисунок
             if (mistakeCount == 0) {
                 System.out.println("Ошибок пока нет");
@@ -195,17 +196,19 @@ public class HangmanMVP {
                 System.out.println("  +---+");
                 System.out.println("  |   |");
                 System.out.println("  O   |");
-                System.out.println(" /|\\   |");
+                System.out.println(" /|\\ |");
                 System.out.println("      |");
                 System.out.println("=========");
             } else if (mistakeCount == 6){
                 System.out.println("  +---+");
                 System.out.println("  |   |");
                 System.out.println("  O   |");
-                System.out.println(" /|\\   |");
-                System.out.println(" / \\   |");
+                System.out.println(" /|\\ |");
+                System.out.println(" / \\ |");
                 System.out.println("=========");
             }
+            System.out.println("Осталось попыток: " + (numberOfAttemps - mistakeCount));
+
 
         }
 
@@ -213,15 +216,12 @@ public class HangmanMVP {
         //
         // выводи информацию о том, какие буквы были введены.
         //
-        public static void displayGuessedLetters (Set < Character > guessedLetters) {
+        public static void displayGuessedLetters (Set <Character> guessedLetters) {
             System.out.print("Введённые буквы: ");
-
             for (char letter : guessedLetters) {
                 System.out.print(letter + " ");
             }
-
             System.out.println();
-
         }
         // МЕТОД 6. Читаем и загружаем список слов
         //
@@ -230,7 +230,6 @@ public class HangmanMVP {
         public static List<String> loadWords (String pathString) throws IOException {
             Path path = Path.of(pathString);
             return Files.readAllLines(path);
-
         }
         // МЕТОД 7. Выбор слова случайным образом
         //
@@ -253,7 +252,7 @@ public class HangmanMVP {
         }
 
         // Главный игровой цикл
-        public static void playGame (List < String > words, Scanner scanner){
+        public static void playGame (List < String > words, Scanner scanner, int numberOfAttempts){
 
             // Секретное слово
             String secretWord = chooseRandomWord(words);
@@ -344,7 +343,7 @@ public class HangmanMVP {
                                     letterFound,
                                     mistakeCount
                             );
-                            displayHangman(mistakeCount);
+                            displayHangman(mistakeCount, numberOfAttempts);
 
                             // ========================================
                             // 2.8. ПРОВЕРКА ПОРАЖЕНИЯ
@@ -385,7 +384,5 @@ public class HangmanMVP {
                     System.out.println();
                 }
             }
-
     }
-
 }
