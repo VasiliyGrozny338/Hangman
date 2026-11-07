@@ -32,7 +32,7 @@ public class HangmanMVP {
             return;
         }
         // Количество попыток
-        int numberOfAttempts = 6;
+
         // Объект для чтения ввода пользователя
         Scanner scanner = new Scanner(System.in);
 
@@ -42,6 +42,7 @@ public class HangmanMVP {
             // Ввод игрока с улучшенной обработкой ввода, где метод trim удаляет пробелы в начале и в конце строки
             String choice = scanner.nextLine().trim();
             if (choice.equals("1")) {
+                int numberOfAttempts = chooseDifficulty(scanner);
                 playGame(words, scanner,numberOfAttempts);
             } else if (choice.equals("0")) {
                 break;
@@ -248,7 +249,32 @@ public class HangmanMVP {
             System.out.println("0 - Выход");
             System.out.println();
             System.out.print("Ваш выбор: ");
+            System.out.println();
 
+        }
+
+        public static int chooseDifficulty(Scanner scanner) {
+            System.out.println("=== Выбор сложности ===");
+            System.out.println("1 - Лёгкая (10 попыток)");
+            System.out.println("2 - Средняя (8 попыток)");
+            System.out.println("3 - Сложная (6 попыток)");
+            System.out.print("Ваш выбор: ");
+            String choice = scanner.nextLine().trim();
+            switch (choice) {
+                case "1" -> {
+                    return 10;
+                }
+                case "2" -> {
+                    return 8;
+                }
+                case "3" -> {
+                    return 6;
+                }
+                default -> {
+                    System.out.println("Неизвестная сложность. Выбрана сложная.");
+                    return 6;
+                }
+            }
         }
 
         // Главный игровой цикл
