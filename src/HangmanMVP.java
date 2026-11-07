@@ -165,7 +165,7 @@ public class HangmanMVP {
     //
     // выводи информацию о том, какие буквы были введены.
     //
-        public static void displayHangman(int mistakeCount, int numberOfAttemps) {
+        public static void displayHangman(int mistakeCount, int numberOfAttempts) {
             // Здесь будем выбирать рисунок
             if (mistakeCount == 0) {
                 System.out.println("Ошибок пока нет");
@@ -199,7 +199,7 @@ public class HangmanMVP {
                 System.out.println(" /|\\ |");
                 System.out.println("      |");
                 System.out.println("=========");
-            } else if (mistakeCount == 6){
+            } else if (mistakeCount >= 6){
                 System.out.println("  +---+");
                 System.out.println("  |   |");
                 System.out.println("  O   |");
@@ -207,7 +207,7 @@ public class HangmanMVP {
                 System.out.println(" / \\ |");
                 System.out.println("=========");
             }
-            System.out.println("Осталось попыток: " + (numberOfAttemps - mistakeCount));
+            System.out.println("Осталось попыток: " + (numberOfAttempts - mistakeCount));
 
 
         }
@@ -349,8 +349,8 @@ public class HangmanMVP {
                             // 2.8. ПРОВЕРКА ПОРАЖЕНИЯ
                             // ========================================
 
-                            // После шестой ошибки игра заканчивается
-                            if (mistakeCount == 6) {
+                            // Игра заканчивается, когда количество ошибок достигает лимита
+                            if (mistakeCount >= numberOfAttempts) {
 
                                 System.out.println("Вы проиграли. Было загадано: " + secretWord);
                                 System.out.println();
