@@ -31,7 +31,6 @@ public class HangmanMVP {
             System.out.println("Файл пустой");
             return;
         }
-        // Количество попыток
 
         // Объект для чтения ввода пользователя
         Scanner scanner = new Scanner(System.in);
@@ -42,8 +41,9 @@ public class HangmanMVP {
             // Ввод игрока с улучшенной обработкой ввода, где метод trim удаляет пробелы в начале и в конце строки
             String choice = scanner.nextLine().trim();
             if (choice.equals("1")) {
+                //кол-во попыток
                 int numberOfAttempts = chooseDifficulty(scanner);
-                playGame(words, scanner,numberOfAttempts);
+                playGame(words, scanner, numberOfAttempts);
             } else if (choice.equals("0")) {
                 break;
             } else {
@@ -168,39 +168,41 @@ public class HangmanMVP {
     //
         public static void displayHangman(int mistakeCount, int numberOfAttempts) {
             // Здесь будем выбирать рисунок
-            if (mistakeCount == 0) {
+            double progress = (double) mistakeCount / numberOfAttempts;
+            int stage = (int) Math.ceil(progress * 6);
+            if (stage == 0) {
                 System.out.println("Ошибок пока нет");
-            } else if (mistakeCount == 1){
+            } else if (stage == 1){
                 System.out.println("=========");
-            } else if (mistakeCount == 2){
+            } else if (stage == 2){
                 System.out.println("      |");
                 System.out.println("      |");
                 System.out.println("      |");
                 System.out.println("      |");
                 System.out.println("      |");
                 System.out.println("=========");
-            } else if (mistakeCount == 3){
+            } else if (stage == 3){
                 System.out.println("  +---+");
                 System.out.println("  |   |");
                 System.out.println("  O   |");
                 System.out.println("      |");
                 System.out.println("      |");
                 System.out.println("=========");
-            } else if (mistakeCount == 4){
+            } else if (stage == 4){
                 System.out.println("  +---+");
                 System.out.println("  |   |");
                 System.out.println("  O   |");
                 System.out.println("  |   |");
                 System.out.println("      |");
                 System.out.println("=========");
-            } else if (mistakeCount == 5){
+            } else if (stage == 5){
                 System.out.println("  +---+");
                 System.out.println("  |   |");
                 System.out.println("  O   |");
                 System.out.println(" /|\\ |");
                 System.out.println("      |");
                 System.out.println("=========");
-            } else if (mistakeCount >= 6){
+            } else if (stage >= 6){
                 System.out.println("  +---+");
                 System.out.println("  |   |");
                 System.out.println("  O   |");
@@ -249,7 +251,6 @@ public class HangmanMVP {
             System.out.println("0 - Выход");
             System.out.println();
             System.out.print("Ваш выбор: ");
-            System.out.println();
 
         }
 
